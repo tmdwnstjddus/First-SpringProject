@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE configuration
+	PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<!-- type에 지정된 some.package.name.ClassName을 alias에 지정된 이름으로 대체하는 설정 -->
+	<typeAliases>
+		<typeAlias type="com.springdemoweb.vo.Member" alias="Member"/>
+		<typeAlias type="com.springdemoweb.vo.Upload" alias="Upload"/>
+		<typeAlias type="com.springdemoweb.vo.UploadFile" alias="UploadFile"/>
+	</typeAliases>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="oracle.jdbc.OracleDriver" />
+				<property name="url" value="jdbc:oracle:thin:@211.197.18.246:1551:xe" />
+				<property name="username" value="lol" />
+				<property name="password" value="lol" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	
+	<!-- SQL + Object Mapping Configuration -->
+	<mappers>
+		<mapper resource="com/springdemoweb/mapper/member-mapper.xml" />
+		<mapper resource="com/springdemoweb/mapper/upload-mapper.xml" />
+	</mappers>
+	
+</configuration>

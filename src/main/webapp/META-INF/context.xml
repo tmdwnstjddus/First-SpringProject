@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Web Application 설정 -->
+<Context path="/springdemoweb5" reloadable="true">
+
+	<Resource 
+		name="jdbc/demoweb" auth="Container"
+		type="javax.sql.DataSource" driverClassName="oracle.jdbc.OracleDriver"
+		url="jdbc:oracle:thin:@211.197.18.246:1551:xe" 
+		username="lol" password="lol" 
+		maxTotal="20"
+		maxIdle="10" 
+		maxWaitMillis="-1" />
+		
+		<!-- maxTotal 최대 갯수, mxaIdle 최소 예비 연결갯수, maxWaitMillis="-1" 최대 갯수 이후 연결은 튕겨내라 -->
+
+
+</Context>

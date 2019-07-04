@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springdemoweb.mapper.UploadMapper">
+
+	<select id="selectUploads" resultType="Upload">
+		SELECT UPLOADNO, TITLE, UPLOADER, REGDATE, RETURNDATE, BOOKCODE, MEMBERCODE, MEMBERNAME, RETURNCHECK
+		FROM BOOK
+		WHERE deleted = '0'
+		ORDER BY uploadNo DESC
+	</select>
+	
+	<select id="selectUploadByUploadNo" 
+		parameterType="int" resultType="Upload">
+		SELECT UPLOADNO, TITLE, UPLOADER, REGDATE, RETURNDATE, CONTENT, BOOKCODE, MEMBERCODE, MEMBERNAME, RETURNCHECK 
+		FROM BOOK
+		WHERE UPLOADNO = #{ uploadNo } AND DELETED = '0'
+	</select>
+	
+	<select id="selectUploadFilesByUploadNo"
+		parameterType="int" resultType="UploadFile">
+		SELECT uploadFileNo, uploadNo, savedFileName, userFileName 
+		FROM BOOKFILE
+		WHERE UPLOADNO = #{ uploadNo }
+	</select>
+	
+	<select id="selectUploadFileByUploadFileNo"
+		parameterType="int" resultType="UploadFile">
+		SELECT uploadFileNo, uploadNo, savedFileName, userFileName
+		FROM BOOKFILE
+		WHERE UPLOADFILENO = #{ uploadFileNo }
+	</select>
+	
+	<!-- **************************************************** -->
+	
+	<!-- insert가 완료된 후 keyColumn(uploadNo)의 값을 vo의 keyProperty(uploadNo)에 저장 -->
+	<insert id="insertUpload" parameterType="Upload"
+			useGeneratedKeys="true" keyColumn="uploadNo" keyProperty="uploadNo">
+		INSERT INTO BOOK (UPLOADNO, TITLE, UPLOADER, CONTENT, BOOKCODE, MEMBERCODE, MEMBERNAME, RETURNCHECK, RETURNDATE)
+		VALUES (UPLOAD_SEQUENCE.NEXTVAL, #{ title }, #{ uploader }, #{ content }, #{ bookCode }, #{ memberCode }, #{ memberName }, #{ returnCheck }, #{ returnDate })
+	</insert>
+	
+	<!-- insert가 완료된 후 selectKey의 SQL을 실행해서 vo의 uploadNo에 값을 저장 -->
+	<insert id="insertUpload2" parameterType="Upload">
+		<selectKey keyProperty="uploadNo" order="AFTER" resultType="int">
+			SELECT UPLOAD_SEQUENCE.CURRVAL FROM DUAL
+		</selectKey>
+		INSERT INTO BOOK (UPLOADNO, TITLE, UPLOADER, CONTENT, BOOKCODE, MEMBERCODE, MEMBERNAME, RETURNCHECK, RETURNDATE)
+		VALUES (UPLOAD_SEQUENCE.NEXTVAL, #{ title }, #{ uploader }, #{ content }, #{ bookCode }, #{ memberCode }, #{ memberName }, #{ returnCheck }, #{ returnDate })
+	</insert>
+	
+	<insert id="insertUploadFile" 
+		parameterType="UploadFile">
+		INSERT INTO BOOKFILE (
+			UPLOADFILENO
+			, UPLOADNO
+			, SAVEDFILENAME
+			, USERFILENAME
+		)
+		VALUES (
+			UPLOADFILE_SEQUENCE.NEXTVAL
+			, #{ uploadNo }
+			, #{ savedFileName }
+			, #{ userFileName }
+		)
+	</insert>
+	
+	<update id="deleteUpload" 
+		parameterType="int">
+		UPDATE BOOK 
+		SET DELETED = '1'
+		WHERE UPLOADNO = #{ uploadNo }
+	</update>
+	
+	<delete id="deleteUploadFile"
+		parameterType="int">
+		DELETE FROM BOOKFILE 
+		WHERE UPLOADFILENO = #{ uploadFileNo }
+	</delete>
+	
+	<update id="updateUpload"
+		parameterType="Upload">
+		UPDATE BOOK 
+		SET TITLE = #{ title }, CONTENT = #{ content }, MEMBERCODE = #{ memberCode }, MEMBERNAME = #{ memberName }, RETURNCHECK = #{ returnCheck }, RETURNDATE = #{ returnDate } 
+		WHERE UPLOADNO = #{ uploadNo }
+	</update>
+	
+   
+   <!-- search -->
+	<select id="selectList" parameterType="hashmap" resultType="Upload">
+      select UPLOADNO, TITLE, UPLOADER, REGDATE, RETURNDATE, BOOKCODE, MEMBERCODE, MEMBERNAME, RETURNCHECK
+      from Book
+      where deleted = '0' 
+      <if test="keyWord != null and keyWord != ''">          
+            <choose>
+               <when test='keyField.equals("all")'>
+                  and ( bookCode like '%'||#{ keyWord }||'%' or title like '%'||#{ keyWord }||'%' or memberName like '%'||#{ keyWord }||'%' or memberCode like '%'||#{ keyWord }||'%' )
+               </when>
+               <when test='keyField.equals("bookCode")'>
+                  and bookCode like '%'||#{ keyWord }||'%'
+               </when>
+                <when test='keyField.equals("title")'>
+                  and title like '%'||#{ keyWord }||'%'
+               </when>              
+               <when test='keyField.equals("memberCode")'>
+                  and memberCode like '%'||#{ keyWord }||'%'
+               </when>
+               <when test='keyField.equals("memberName")'>
+                  and memberName like '%'||#{ keyWord }||'%'
+               </when>
+            </choose>         
+            
+       </if>
+         
+       order by uploadNo DESC
+   </select>
+   
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
